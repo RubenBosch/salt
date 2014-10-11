@@ -747,8 +747,8 @@ def create_dns_record(hostname, ip_address):
     '''
     Creates a DNS record for the given hostname if the domain is managed with DO.
     '''
-    domainname = '.'.join(hostname.split('.')[-2:])
-    subdomain = '.'.join(hostname.split('.')[:-2])
+    domainname = '.'.join(hostname.split('.')[1:])
+    subdomain = hostname.split('.')[0]
     domain = query(method='domains', droplet_id=domainname)
 
     if domain:
@@ -762,8 +762,8 @@ def delete_dns_record(hostname):
     '''
     Deletes a DNS for the given hostname if the domain is managed with DO.
     '''
-    domainname = '.'.join(hostname.split('.')[-2:])
-    subdomain = '.'.join(hostname.split('.')[:-2])
+    domainname = '.'.join(hostname.split('.')[1:])
+    subdomain = hostname.split('.')[0]
     records = query(method='domains', droplet_id=domainname, command='records')
 
     if records:
