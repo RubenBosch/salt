@@ -743,15 +743,32 @@ def destroy(name, call=None):
     return node
 
 
+def get_dns_zone(hostname):
+    '''
+    Finds the longest available zone registered
+    '''
+    domains = query(method='domains')
+    domainname = None
+    subdomain = None
+    records = query(method='domains')
+    
+    for _range in range(len(hostname.split('.')),1,-1):
+        for record in records['domain_records']:
+            if record['name'] == '.'.join(hostname.split('.')[-_range:]:
+                domainname = '.'.join(hostname.split('.')[-_range:]
+                subdomain = '.'.join(hostname.split('.')[:-_range]
+                return domainname, subdomain
+                
+    return None, None
+
 def create_dns_record(hostname, ip_address):
     '''
     Creates a DNS record for the given hostname if the domain is managed with DO.
     '''
-    domainname = '.'.join(hostname.split('.')[1:])
-    subdomain = hostname.split('.')[0]
-    domain = query(method='domains', droplet_id=domainname)
 
-    if domain:
+    domainname, subdomain = get_dns_zone(hostname)
+
+    if domainname:
         result = query(method='domains', droplet_id=domainname, command='records', args={'type': 'A', 'name': subdomain, 'data': ip_address}, http_method='post')
         return result
 
@@ -762,8 +779,7 @@ def delete_dns_record(hostname):
     '''
     Deletes a DNS for the given hostname if the domain is managed with DO.
     '''
-    domainname = '.'.join(hostname.split('.')[1:])
-    subdomain = hostname.split('.')[0]
+    domainname, subdomain = get_dns_zone(hostname)
     records = query(method='domains', droplet_id=domainname, command='records')
 
     if records:
